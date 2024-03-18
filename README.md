@@ -34,21 +34,21 @@
 >
 > 数据来源：数据来源自DojinDB网站，数据包括但不限于以下信息：作品ID，历史销量（30日内/3月内/今年内/往年每年），
 >
-> ![image-20240318154225039](C:\Users\User\AppData\Roaming\Typora\typora-user-images\image-20240318154225039.png)
+> ![image](https://github.com/Hammerous/DLsite-Analyse/assets/79643219/f51b196b-bf99-468d-bd1e-5af823ed51b3)
 >
 > 作品Tag类型，
 >
-> ![image-20240318154247677](C:\Users\User\AppData\Roaming\Typora\typora-user-images\image-20240318154247677.png)
+> ![image](https://github.com/Hammerous/DLsite-Analyse/assets/79643219/d80de248-ec7a-4387-a4a0-a55d91023f56)
 >
 > 发售时间，
 >
 > 用户评分及其等第明细，
 >
-> ![image-20240318154347378](C:\Users\User\AppData\Roaming\Typora\typora-user-images\image-20240318154347378.png)
+>![image](https://github.com/Hammerous/DLsite-Analyse/assets/79643219/e8a6c19d-444a-46cc-a076-b2129c068a9e)
 >
 > 作品赏析常用Tag
 >
-> ![image-20240318154307393](C:\Users\User\AppData\Roaming\Typora\typora-user-images\image-20240318154307393.png)
+> ![image](https://github.com/Hammerous/DLsite-Analyse/assets/79643219/100467da-cc54-4b13-a5e2-12c0186e0a79)
 >
 > 等信息
 
