@@ -1,5 +1,31 @@
-import scrapy,time,json,demjson3
+import scrapy,time,json,demjson3,datetime,copy
 from SingleWork_Crawler.items import SingleWork
+
+def get_julian_day(date_string):
+    date_obj = datetime.datetime.strptime(date_string, "%Y-%m-%d")
+    julian_day = date_obj.toordinal() + 1721424.5
+    return julian_day+1
+
+def historyRecord(log_record):
+    single_time_stamp = {'site':'',
+                        'code':'',
+                        'price':'',
+                        'amount':'',
+                        'time_ymd':'',
+                        'campaign':'',
+                        'amount_diff':'',
+                        'value':''
+                        }
+    single_time_stamp['site'] = str(log_record['site'])
+    single_time_stamp['code'] = str(log_record['code'])
+    single_time_stamp['price'] = str(log_record['price'])
+    single_time_stamp['amount'] = str(log_record['amount'])
+    single_time_stamp['time_ymd'] = str(log_record['time_ymd'])
+    single_time_stamp['campaign'] = str(log_record['campaign'])
+    single_time_stamp['amount_diff'] = str(log_record['amount_diff'])
+    single_time_stamp['value'] = str(log_record['value'])
+    julianDate = int(get_julian_day(log_record['time_ymd']))
+    return single_time_stamp,julianDate
 
 class WorkcrawlerSpider(scrapy.Spider):
     name = "WorkCrawler"
@@ -95,7 +121,16 @@ class WorkcrawlerSpider(scrapy.Spider):
     def parse_history(self, response):
         # extract information from responsed data
         link_data = json.loads(response.text)
-        
+        if(len(link_data['log'])):
+            single_history_data = {'log':{},'price_sum':-1,'amount_sum':-1}
+            for log_record in link_data['log']:
+                single_time_stamp, julianDate = historyRecord(log_record)
+                single_history_data['log'].update({julianDate:single_time_stamp})
+            single_history_data['price_sum'] = str(link_data['price_sum'])
+            single_history_data['amount_sum'] = str(link_data['amount_sum'])
+            link_data = single_history_data
+        else:
+            link_data = ''
         # yielding data into item
         item = response.meta['item']
         period = response.meta['period']
