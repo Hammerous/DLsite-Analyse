@@ -7,9 +7,8 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-RANDOM_DELAY = 3
-DOWNLOADER_MIDDLEWARES = {
-    "SingleWork_Crawler.middlewares.RandomDelayMiddleware": 543}
+#RANDOM_DELAY = 3
+#DOWNLOADER_MIDDLEWARES = {"SingleWork_Crawler.middlewares.RandomDelayMiddleware": 543}
 
 RANDOMIZE_DOWNLOAD_DELAY=True
 BOT_NAME = "SingleWork_Crawler"
