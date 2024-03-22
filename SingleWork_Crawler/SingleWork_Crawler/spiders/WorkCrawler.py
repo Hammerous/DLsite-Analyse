@@ -73,6 +73,14 @@ class WorkcrawlerSpider(scrapy.Spider):
             print(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time())) + " start request: " + start_urls)
             yield scrapy.Request(start_urls, callback=lambda response,workID=key,extra_info=value: self.parse(response,workID,extra_info), meta={"dont_redirect": True, "handle_httpstatus_list": [301],"dont_filter": True})
 
+    def dataserie_check(self,time_label_price,dlsite_price,fanza_price):
+        if(len(time_label_price)-len(dlsite_price) == 1):
+            dlsite_price.append('None')
+        if(len(time_label_price)-len(fanza_price) == 1):
+            fanza_price.append('None')
+        if(len(time_label_price)!=len(fanza_price)!=len(dlsite_price)):
+            raise ValueError('price seire ERROR!')
+
     def parse(self, response, workID, extra_info):
         item = SingleWork()
         item["ID"] =  str(workID)
@@ -102,12 +110,9 @@ class WorkcrawlerSpider(scrapy.Spider):
         time_label_price = data["labels"]
         dlsite_price = data["datasets"][0]["data"]
         dlsite_price = ['None' if x is demjson3.undefined else str(x) for x in dlsite_price]
-        if(check_identity(dlsite_price)):
-            dlsite_price.append(dlsite_price[0])
         fanza_price = data["datasets"][1]["data"]
         fanza_price = ['None' if x is demjson3.undefined else str(x) for x in fanza_price]
-        if(check_identity(fanza_price)):
-            fanza_price.append(fanza_price[0])
+        self.dataserie_check(time_label_price,dlsite_price,fanza_price)
         item["price_data"] = {"time": time_label_price, 
                               "dlsite": dlsite_price, 
                               "fanza": fanza_price
