@@ -7,9 +7,6 @@ def get_julian_day(date_string):
     julian_day = date_obj.toordinal() + 1721424.5
     return julian_day+1
 
-def check_identity(list):
-    return len(list) and list.count(list[0]) == len(list)
-
 class WorkcrawlerSpider(scrapy.Spider):
     name = "WorkCrawler"
     allowed_domains = ["dojindb.net"]
