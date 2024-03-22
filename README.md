@@ -130,10 +130,11 @@ https://dojindb.net/w/441319?mode=getgraph&g=thismonth
 
 
 
+------
 
 ###工事中###
 
-------
+(DLsite的数据格式比dojinDB更复杂，可以参照其他项目的代码处理)
 
 [可以用来查询特定社团的信息](https://dojindb.net/c/?s=%E8%81%96%E8%8F%AF%E5%BF%AB%E6%A5%BD%E6%9B%B8%E5%BA%97&mode=getgraph&g=30days)
 
@@ -158,3 +159,19 @@ https://dojindb.net/w/441319?mode=getgraph&g=thismonth
 
 >
 > 等信息
+###工事中###
+
+------
+
+## **3.数据爬取**
+
+以数据源为依据，以下分为两部分介绍数据爬取的过程与原始数据的存储格式。
+
+### （1）dojinDB
+
+数据爬取的大致流程如下：
+
+![image](https://github.com/Hammerous/DLsite-Analyse/assets/79643219/fd2669fa-4897-46d0-807d-64a02a606ad5)
+
+
+### （2）DLsite
