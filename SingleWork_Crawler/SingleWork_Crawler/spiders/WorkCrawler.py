@@ -7,6 +7,9 @@ def get_julian_day(date_string):
     julian_day = date_obj.toordinal() + 1721424.5
     return julian_day+1
 
+def check_identity(list):
+    return len(list) and list.count(list[0]) == len(list)
+
 class WorkcrawlerSpider(scrapy.Spider):
     name = "WorkCrawler"
     allowed_domains = ["dojindb.net"]
@@ -98,10 +101,16 @@ class WorkcrawlerSpider(scrapy.Spider):
         data = demjson3.decode(json_string) #convert javascript string to json object
         time_label_price = data["labels"]
         dlsite_price = data["datasets"][0]["data"]
+        dlsite_price = ['None' if x is demjson3.undefined else str(x) for x in dlsite_price]
+        if(check_identity(dlsite_price)):
+            dlsite_price.append(dlsite_price[0])
         fanza_price = data["datasets"][1]["data"]
+        fanza_price = ['None' if x is demjson3.undefined else str(x) for x in fanza_price]
+        if(check_identity(fanza_price)):
+            fanza_price.append(fanza_price[0])
         item["price_data"] = {"time": time_label_price, 
-                              "dlsite": ['None' if x is demjson3.undefined else str(x) for x in dlsite_price], 
-                              "fanza": ['None' if x is demjson3.undefined else str(x) for x in fanza_price]
+                              "dlsite": dlsite_price, 
+                              "fanza": fanza_price
                               }
         #obtain main tags
         main_tags = []
