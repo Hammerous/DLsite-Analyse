@@ -12,7 +12,7 @@ class WorkcrawlerSpider(scrapy.Spider):
     allowed_domains = ["dojindb.net"]
     start_urls = ["http://dojindb.net/w/"]
     work_dict = {}
-    crawl_folder_path = None
+    crawl_file_path = None
 
     #Initialize class
     def __init__(self, csv_path = None, *args, **kwargs):
@@ -20,9 +20,7 @@ class WorkcrawlerSpider(scrapy.Spider):
         if csv_path is None:
             raise ValueError("A CSV Path must be provided")
         # CSV read in
-        self.crawl_folder_path = os.path.splitext(csv_path)[0]
-        if os.path.exists(self.crawl_folder_path) is False:
-            os.makedirs(self.crawl_folder_path)
+        self.crawl_file_path = os.path.splitext(csv_path)[0]
         try:
             df = pd.read_csv(csv_path)
             # check required data
