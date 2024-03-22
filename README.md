@@ -171,7 +171,8 @@ https://dojindb.net/w/441319?mode=getgraph&g=thismonth
 
 数据爬取的大致流程如下：
 
-![image](https://github.com/Hammerous/DLsite-Analyse/assets/79643219/fd2669fa-4897-46d0-807d-64a02a606ad5)
+![新建 Microsoft PowerPoint 演示文稿](https://github.com/Hammerous/DLsite-Analyse/assets/79643219/fb4b35a0-3354-4eec-a928-d4d6ac4bbf22)
 
+------
 
 ### （2）DLsite
