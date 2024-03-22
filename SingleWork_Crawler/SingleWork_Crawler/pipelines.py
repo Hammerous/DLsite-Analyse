@@ -8,11 +8,10 @@
 from itemadapter import ItemAdapter
 import time,json,codecs,os
 
-
 class SingleworkCrawlerPipeline:
     Time_TMP = int(0)
 
-    def __init__(self, workID = None, *args, **kwargs):
+    def __init__(self):
         SingleworkCrawlerPipeline.Time_TMP = time.time()    
         local_time = time.localtime(SingleworkCrawlerPipeline.Time_TMP)
         timeStr = time.strftime("%Y-%m-%d %H:%M:%S", local_time)
@@ -20,7 +19,7 @@ class SingleworkCrawlerPipeline:
         print("Program Start Time: "+ timeStr)
 
     def open_spider(self, spider):
-        self.json_file = codecs.open(spider.workID+'.json', 'w+', encoding='UTF-8')
+        self.json_file = codecs.open(spider.crawl_file_path +'.json', 'w+', encoding='UTF-8')
         # 在爬虫开始时，首先写入一个 '[' 符号，构造一个 json 数组
         # 为使得 Json 文件具有更高的易读性，我们辅助输出了 '\n'（换行符）
         self.json_file.write('[\n')

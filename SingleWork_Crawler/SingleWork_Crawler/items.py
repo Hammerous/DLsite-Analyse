@@ -9,6 +9,7 @@ import scrapy
 class SingleWork(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
+    #RJ_ID = scrapy.Field()
     ID = scrapy.Field()
     main_genre = scrapy.Field()
     title = scrapy.Field()
@@ -16,6 +17,7 @@ class SingleWork(scrapy.Item):
     price_data = scrapy.Field()
     main_tags = scrapy.Field()
     historyData = scrapy.Field()
+    extra_info = scrapy.Field()
 
 class historyData(scrapy.Item):
     pass
