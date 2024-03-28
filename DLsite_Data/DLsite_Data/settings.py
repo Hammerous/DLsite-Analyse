@@ -11,8 +11,8 @@ BOT_NAME = "DLsite_Data"
 
 SPIDER_MODULES = ["DLsite_Data.spiders"]
 NEWSPIDER_MODULE = "DLsite_Data.spiders"
-USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.131 Safari/537.36"
-
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+LOG_LEVEL = "WARNING"
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "DLsite_Data (+http://www.yourdomain.com)"
 
@@ -32,7 +32,7 @@ RANDOMIZE_DOWNLOAD_DELAY = True
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
-#COOKIES_ENABLED = False
+COOKIES_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
