@@ -6,10 +6,9 @@
 import scrapy
 
 
-class DlsiteDataItem(scrapy.Item):
+class HomepageItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     ID = scrapy.Field()
     Rank = scrapy.Field()
     Sales = scrapy.Field()
-    pass
