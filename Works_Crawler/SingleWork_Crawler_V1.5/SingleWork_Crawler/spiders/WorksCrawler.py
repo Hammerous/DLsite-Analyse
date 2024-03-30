@@ -29,9 +29,9 @@ class WorkcrawlerSpider(scrapy.Spider):
         try:
             df = pd.read_csv(csv_path)
             # check required data
-            if "ID" in df.columns and "Rank" in df.columns and "Sales" in df.columns:
+            if "ID" in df.columns:
                 for index, row in df.iterrows():
-                    self.work_dict[row["ID"]] = {"Rank": str(row["Rank"]), "Sales": str(row["Sales"])}
+                    self.work_dict[row["ID"]] = {col: str(row[col]) for col in df.columns if col != "ID"}
             else:
                 missing_columns = [col for col in ["ID", "rank", "sales"] if col not in df.columns]
                 print(f"Missing columns {missing_columns} in {csv_path}")
