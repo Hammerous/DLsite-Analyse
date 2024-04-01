@@ -1,4 +1,4 @@
-import scrapy,time,json,demjson3,datetime,os
+import scrapy,json,demjson3,datetime,os
 from tqdm.autonotebook import tqdm
 import pandas as pd
 from ..items import SingleWork
@@ -179,9 +179,9 @@ class WorkcrawlerSpider(scrapy.Spider):
         item["historyData"] = {}
         item["extra_info"] = extra_info
         # start iterating requests
-        return self.parse_links(response, item, historyData)
+        return self.parse_links(item, historyData)
 
-    def parse_links(self, response, item, historyData):
+    def parse_links(self, item, historyData):
         # pop out the next item if there is any
         if historyData:
             # period and url in next item
