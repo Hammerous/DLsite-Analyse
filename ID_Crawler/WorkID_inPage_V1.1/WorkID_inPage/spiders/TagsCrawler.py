@@ -6,7 +6,13 @@ class TagscrawlerSpider(scrapy.Spider):
     name = "TagsCrawler"
     allowed_domains = ["dojindb.net"]
     start_urls = ["http://dojindb.net/"]
+    csv_path = None
     crawl_folder_path = ""
+
+    def __init__(self, csv_path = None, *args, **kwargs):
+        if csv_path is None:
+            raise ValueError("A CSV Path must be provided")
+        self.csv_path = csv_path.split(".")[0]
 
     def start_requests(self):
         url = "https://dojindb.net/d/?c=site_tags"
@@ -19,7 +25,8 @@ class TagscrawlerSpider(scrapy.Spider):
         item['Sales'] = []
         item['Site'] = []
         item['RankChart'] = []
-        item['Title'] =  response.xpath("//div[@class='data_h2']/b/text()").get().replace(" ","")
+        #item['Title'] =  response.xpath("//div[@class='data_h2']/b/text()").get().replace(" ","")
+        item['Title'] = self.csv_path
         data_box = response.xpath("//div[@class='data_box']")
         ranking_types = [each.get( )for each in data_box.xpath(".//div[@class='data_h3 mb15']/b/text()")]
         ranking_charts = data_box.xpath(".//div[@class='row']")

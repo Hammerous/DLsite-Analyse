@@ -4,7 +4,7 @@ from twisted.internet import reactor
 from scrapy.utils.project import get_project_settings
 import os
 
-tag_csvpath = f"test_tag.csv"
+tag_csvpath = f"tags.csv"
 
 i = 0
 def crawl(runner):
@@ -22,7 +22,6 @@ def crawl(runner):
         os._exit(0)
     return d
 
-
 def loop_crawl():
     runner = CrawlerRunner(get_project_settings())
     crawl(runner)
@@ -30,7 +29,7 @@ def loop_crawl():
 
 if __name__ == '__main__':
     i = 0
-    Crawler_Mission = [['HomepageCrawler'],['TagsCrawler'],\
+    Crawler_Mission = [['HomepageCrawler'],['TagsCrawler', tag_csvpath],\
                        ['PagesCrawler', tag_csvpath]]
     dirpath=os.path.dirname(os.path.abspath(__file__))
     # 获取当前路径
