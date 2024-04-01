@@ -179,9 +179,9 @@ class WorkcrawlerSpider(scrapy.Spider):
         item["historyData"] = {}
         item["extra_info"] = extra_info
         # start iterating requests
-        return self.parse_links(item, historyData)
+        return self.parse_links(response, item, historyData)
 
-    def parse_links(self, item, historyData):
+    def parse_links(self, response, item, historyData):
         # pop out the next item if there is any
         if historyData:
             # period and url in next item
