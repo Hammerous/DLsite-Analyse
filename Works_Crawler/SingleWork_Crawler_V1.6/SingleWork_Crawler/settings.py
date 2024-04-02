@@ -8,10 +8,17 @@
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 BOT_NAME = "SingleWork_Crawler"
-LOG_LEVEL = "WARNING"
 SPIDER_MODULES = ["SingleWork_Crawler.spiders"]
 NEWSPIDER_MODULE = "SingleWork_Crawler.spiders"
 RANDOMIZE_DOWNLOAD_DELAY = True
+
+LOG_ENABLED = True
+LOG_LEVEL = "WARNING"
+LOG_FILE = 'Scrapy.log'
+LLOG_FILE_APPEND = False
+
+RETRY_ENABLED = True
+DOWNLOAD_FAIL_ON_DATALOSS = False
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "SingleWork_Crawler (+http://www.yourdomain.com)"
@@ -75,7 +82,7 @@ AUTOTHROTTLE_ENABLED = True
 AUTOTHROTTLE_MAX_DELAY = 60
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
-#AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
+AUTOTHROTTLE_TARGET_CONCURRENCY = 16.0
 # Enable showing throttling stats for every response received:
 #AUTOTHROTTLE_DEBUG = False
 

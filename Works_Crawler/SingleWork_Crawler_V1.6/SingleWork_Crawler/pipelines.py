@@ -30,9 +30,12 @@ class SingleworkCrawlerPipeline:
     def process_item(self, item, spider):
         item_json = json.dumps(dict(item), ensure_ascii=False)
         self.json_file.write('\t' + item_json + ',\n')
+        spider.pbar_download.update(1)
         return item
     
     def close_spider(self, spider):
+        spider.pbar_request.refresh()
+        spider.pbar_download.refresh()
         spider.pbar_request.close()
         spider.pbar_download.close()
         # 在结束后，需要对 process_item 最后一次执行输出的 “逗号” 去除

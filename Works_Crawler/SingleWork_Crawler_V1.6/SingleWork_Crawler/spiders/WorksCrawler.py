@@ -196,7 +196,6 @@ class WorkcrawlerSpider(scrapy.Spider):
             return request
         else:
             # all items processed
-            self.pbar_download.update(1)
             return item
 
     def parse_history(self, response):
@@ -208,7 +207,6 @@ class WorkcrawlerSpider(scrapy.Spider):
                 single_time_stamp, julianDate = self.historyRecord(log_record)
                 if single_time_stamp is None:
                      # all items processed
-                    self.pbar_download.update(1)
                     return item
                 single_history_data["log"].update({julianDate:single_time_stamp})
             single_history_data["price_sum"] = str(link_data["price_sum"])

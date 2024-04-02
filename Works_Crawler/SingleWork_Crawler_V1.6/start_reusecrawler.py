@@ -3,7 +3,7 @@ from scrapy.crawler import CrawlerRunner
 from scrapy.utils.project import get_project_settings
 from twisted.internet import reactor
 
-folder_path = r'D:\2024Spring\DLsite-Analysis\ID_Crawler\WorkID_inPage_V1.0\test_tag\batches'
+folder_path = r'D:\2024Spring\DLsite-Analysis\ID_Crawler\WorkID_inPage_V1.1\CSVs\batches'
 
 '''
 i = 0
