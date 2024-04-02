@@ -62,5 +62,6 @@ class WorkidInpagePipeline:
     def close_spider(self, spider):
         if(hasattr(spider,'pbar_lst')):
             for each in spider.pbar_lst:
+                each.refresh()
                 each.close()
             self.process_csv_files(spider.crawl_folder_path)
