@@ -101,3 +101,24 @@ class WorkidInpageDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info("Spider opened: %s" % spider.name)
+
+from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
+from fake_useragent import UserAgent
+
+class RandomUserAgentMiddleware(UserAgentMiddleware):
+    """
+        自动随机更换UA
+    """
+    def __init__(self):
+        super(RandomUserAgentMiddleware, self).__init__()
+        self.UserAgent = UserAgent()
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            user_agent_list=crawler.settings.get('USER_AGENT')
+        )
+
+    def process_request(self, request, spider):
+        random_user_agent = UserAgent.random
+        request.headers.setdefault('User-Agent', random_user_agent)

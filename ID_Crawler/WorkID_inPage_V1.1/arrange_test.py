@@ -31,5 +31,5 @@ def process_csv_files(directory_path):
     print(f"Combined data saved in {combined_filename}.")
 
 # Example usage:
-directory_path = "D:\\2024Spring\\DLsite-Analysis\\ID_Crawler\\WorkID_inPage_V0.9\\test_tag"
+directory_path = "D:\\2024Spring\\DLsite-Analysis\\ID_Crawler\\WorkID_inPage_V1.1\\CSVs"
 process_csv_files(directory_path)
