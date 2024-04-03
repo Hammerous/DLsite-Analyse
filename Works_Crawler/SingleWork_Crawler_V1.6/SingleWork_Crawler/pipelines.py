@@ -45,8 +45,27 @@ class SingleworkCrawlerPipeline:
         self.json_file.truncate()
         # 重新输出'\n'，并输入']'，与 open_spider(self, spider) 时输出的 '['，构成一个完整的数组格式
         self.json_file.write('\n]')
+
+        print('Checking data completency...')
+        # 读取JSON文件中的所有ID
+        self.json_file.seek(0)  # 移动到文件开头
+        try:
+            data = json.load(self.json_file)
+            json_ids = {int(item['ID']) for item in data}
+        except json.JSONDecodeError:
+            json_ids = set()
         # 关闭文件
         self.json_file.close()
+        # 检查work_dict中的ID是否在json_ids中
+        missing_ids = set(spider.work_dict.keys()) - json_ids
+        # 如果有缺失的ID，写入一个新的txt文件
+        if missing_ids:
+            print("Missing: {0}".format(missing_ids))
+            with open(spider.crawl_folder_path + '_missing_ids.txt', 'w') as f:
+                for missing_id in missing_ids:
+                    f.write(str(missing_id) + '\n')
+        else:
+            print("All IDs Checked!")
         
         time_now = time.time()
         local_time =  time.localtime(time_now)

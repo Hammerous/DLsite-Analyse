@@ -22,7 +22,7 @@ i = 0
 def crawl(runner):
     global i,file_path
     if(i<len(file_path)):
-        print('\nCrawl Mission {0}/{1}'.format(i+1,len(file_path)))
+        print('\nCrawl Mission {0}/{1}: {2}'.format(i+1,len(file_path),file_path))
         d = runner.crawl('WorksCrawler',file_path[i])
         #d.addBoth(sleep)
         d.addBoth(lambda _: crawl(runner))
