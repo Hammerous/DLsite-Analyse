@@ -1,4 +1,4 @@
-import scrapy,ijson,json,os,codecs,re
+import scrapy,ijson,json,os,re
 from ..items import DLsiteCrawlerItem, FANZACrawlerItem
 from tqdm.autonotebook import tqdm
 
@@ -44,13 +44,11 @@ class DualsitesSpiderSpider(scrapy.Spider):
         print('Loading {0} ...'.format(json_path))
         with open(json_path,"r+", encoding='utf-8') as f:
             for record in ijson.items(f, 'item'):
-                if('second status' in record and record['second status'] == 1):
-                    continue
                 ID = record['ID']
                 release_dtl = record['release_dtl']
                 urls = {}
                 for key,value in release_dtl.items():
-                    urls[key] = value['url']
+                    urls[key] = {'url':value['url']}
                     self.url_sum += 1
                 self.work_dict[ID] = urls
         print('{0} records loaded'.format(len(self.work_dict.items())))
@@ -64,8 +62,8 @@ class DualsitesSpiderSpider(scrapy.Spider):
 
     #Initialize request
     def start_requests(self):
-        self.pbar_request  = tqdm(total=self.url_sum, desc=" Request Progress", leave=True, position = 0 ,mininterval = 0.5)
-        self.pbar_download = tqdm(total=self.url_sum, desc="Download Progress", leave=True, position = 1, mininterval = 0.5)
+        self.pbar_request  = tqdm(total=self.url_sum, desc=" Request Progress", leave=True, position = 0 ,mininterval = 1)
+        self.pbar_download = tqdm(total=self.url_sum, desc="Download Progress", leave=True, position = 1, mininterval = 1)
         for ID, url_info in self.work_dict.items():
             for site_id, url in url_info.items():
                 if site_id[0] == 'R':       #RJ serial
@@ -74,6 +72,7 @@ class DualsitesSpiderSpider(scrapy.Spider):
                     yield scrapy.Request(urls[0], callback=self.parse_DLsite_workpage, meta={"ID": ID, "urls": urls})
                 elif site_id[0] == 'd':     #DMM serial
                     self.pbar_request.update(1)
+                    url = f'https://www.dmm.co.jp/dc/doujin/-/detail/=/cid={site_id}/'
                     yield scrapy.Request(url, callback=self.parse_FANZA, cookies = self.FANZA_cookies, meta={"ID": ID})
 
     def Dlsite_Extract(self, term, info_item):
@@ -99,19 +98,24 @@ class DualsitesSpiderSpider(scrapy.Spider):
 
     def parse_DLsite_workpage(self, response):
         item = DLsiteCrawlerItem()
-        item['Site'] = 'RJ'
         item['ID'] = response.meta['ID']
         basic_info = response.xpath("//table[@id='work_outline']/tr")
-        for info_item in basic_info:
-            info_title = info_item.xpath(".//th/text()").get()
-            item_type, info_content = self.Dlsite_Extract(info_title,info_item)
-            if(item_type == None):
-                continue
-            item[item_type] = info_content
-        next_url = response.meta['urls'][1]
-        request = scrapy.Request(next_url, callback=self.parse_DLsite_reviews, meta=response.meta)
-        request.meta["item"] = item
-        return request
+        if(len(basic_info)):
+            item['Site'] = 'RJ'
+            for info_item in basic_info:
+                info_title = info_item.xpath(".//th/text()").get()
+                item_type, info_content = self.Dlsite_Extract(info_title,info_item)
+                if(item_type == None):
+                    continue
+                item[item_type] = info_content
+            next_url = response.meta['urls'][1]
+            request = scrapy.Request(next_url, callback=self.parse_DLsite_reviews, meta=response.meta)
+            request.meta["item"] = item
+            return request
+        else:
+            item['Site'] = 'ERROR'
+            self.pbar_download.update(1)
+            return item
     
     def parse_DLsite_reviews(self, response):
         data = json.loads(response.text)
@@ -148,7 +152,7 @@ class DualsitesSpiderSpider(scrapy.Spider):
         item['CmtReviews'] = detail['review_count']
         item['Translation_info'] = detail['translation_info']
         self.pbar_download.update(1)
-        return item
+        yield item
 
     def FANZA_Extract(self, term, info_item):
         if(term in self.FANZA_terms):
@@ -173,54 +177,60 @@ class DualsitesSpiderSpider(scrapy.Spider):
 
     def parse_FANZA(self, response):
         item = FANZACrawlerItem()
-        item['Site'] = 'DM'
         item['ID'] = response.meta['ID']
-        Genre = response.xpath("//span[contains(@class, 'c_icon_productGenre')]/text()").get().strip()
-        item['Genre'] = Genre
-
         basic_info = response.xpath("//div[@class='l-areaProductInfo']")
-        level0_info = basic_info.xpath(".//div[@class='productSales']")
-        item['Sales'] = level0_info.xpath(".//span[@class='numberOfSales__txt']/text()").get()
-        string_info = level0_info.xpath(".//span[@class='favorites__txt']/text()").get()
-        if(string_info != None):
-            item['Favorites'] = re.findall("\d+\.?\d*", string_info)[0]  # regular expression
+        if(len(basic_info)):
+            item['Site'] = 'DM'
+            level0_info = basic_info.xpath(".//div[@class='productSales']")
+            item['Sales'] = level0_info.xpath(".//span[@class='numberOfSales__txt']/text()").get()
+            string_info = level0_info.xpath(".//span[@class='favorites__txt']/text()").get()
+            if(string_info != None):
+                item['Favorites'] = re.findall("\d+\.?\d*", string_info)[0]  # regular expression
 
-        level1_info = basic_info.xpath(".//div[@class='productInformation u-common__clearfix']/div")
-        for info_item in level1_info:
-            info_title = info_item.xpath(".//dt[@class='informationList__ttl']/text()").get()
-            item_type, info_content = self.FANZA_Extract(info_title,info_item)
-            if(item_type == None):
-                continue
-            item[item_type] = info_content
+            level1_info = basic_info.xpath(".//div[@class='productInformation u-common__clearfix']/div")
+            for info_item in level1_info:
+                info_title = info_item.xpath(".//dt[@class='informationList__ttl']/text()").get()
+                item_type, info_content = self.FANZA_Extract(info_title,info_item)
+                if(item_type == None):
+                    continue
+                item[item_type] = info_content
 
-        #ranking data extraction
-        ranking_data = basic_info.xpath(".//ul[@class='rankingList']/li")
-        if(ranking_data.get() != None):
-            Ranking_info = {}
-            for ranking_item in ranking_data:
-                ranking_type = ranking_item.xpath(".//span[@class='rankingList__txt']/text()").get()
-                ranking_number = ranking_item.xpath(".//span[@class='rankingList__txt--number']/text()").get()
-                # Extract position text
-                Ranking_info[ranking_type] = ranking_number
-            item['Ranking_info'] = Ranking_info
-        
-        #rating & reviews data extraction
-        review_profile = response.xpath("//div[@class='dcd-review__points']")
-        if(review_profile.get() != None):
-            item['Rating'] = review_profile.xpath(".//p[1]/strong/text()").get()
-            item['Reviews'] = review_profile.xpath(".//p[2]/strong/text()").get()
-            item['CmtReviews'] = re.findall("\d+\.?\d*", review_profile.xpath(".//p[2]/text()[2]").get())[0]  # regular expression
-            review_details = response.xpath("//div[@class='dcd-review__rating_map']/div")
-            Rating_info = {}
-            for idx in range(5):
-                Rating_level = 5 - idx
-                all_rated = review_details[idx].xpath(".//span[3]/text()").get().replace("件","")
-                cmt_rate_content = review_details[3].xpath(".//span[3]/following-sibling::a/text()").get()
-                if(cmt_rate_content == None):
-                    cmt_rated = re.findall("\d+\.?\d*", review_details[3].xpath(".//span[3]/following-sibling::text()").get())[0]
-                else:
-                    cmt_rated = re.findall("\d+\.?\d*", cmt_rate_content)[0]
-                Rating_info[Rating_level] = [all_rated, cmt_rated]
-            item['Rating_info'] = Rating_info
-        self.pbar_download.update(1)
-        return item
+            #ranking data extraction
+            ranking_data = basic_info.xpath(".//ul[@class='rankingList']/li")
+            if(len(ranking_data)):
+                Ranking_info = {}
+                for ranking_item in ranking_data:
+                    ranking_type = ranking_item.xpath(".//span[@class='rankingList__txt']/text()").get()
+                    ranking_number = ranking_item.xpath(".//span[@class='rankingList__txt--number']/text()").get()
+                    # Extract position text
+                    Ranking_info[ranking_type] = ranking_number
+                item['Ranking_info'] = Ranking_info
+            
+            #rating & reviews data extraction
+            review_profile = response.xpath("//div[@class='dcd-review__points']")
+            if(len(review_profile)):
+                item['Rating'] = review_profile.xpath(".//p[1]/strong/text()").get()
+                item['Reviews'] = review_profile.xpath(".//p[2]/strong/text()").get()
+                item['CmtReviews'] = re.findall("\d+\.?\d*", review_profile.xpath(".//p[2]/text()[2]").get())[0]  # regular expression
+                review_details = response.xpath("//div[@class='dcd-review__rating_map']/div")
+                Rating_info = {}
+                for idx in range(5):
+                    Rating_level = 5 - idx
+                    all_rated = review_details[idx].xpath(".//span[3]/text()").get().replace("件","")
+                    cmt_rate_content = review_details[3].xpath(".//span[3]/following-sibling::a/text()").get()
+                    if(cmt_rate_content == None):
+                        cmt_rated = re.findall("\d+\.?\d*", review_details[3].xpath(".//span[3]/following-sibling::text()").get())[0]
+                    else:
+                        cmt_rated = re.findall("\d+\.?\d*", cmt_rate_content)[0]
+                    Rating_info[Rating_level] = [all_rated, cmt_rated]
+                item['Rating_info'] = Rating_info
+            
+            Genre = response.xpath("//span[contains(@class, 'c_icon_productGenre')]/text()").get().strip()
+            item['Genre'] = Genre
+
+            self.pbar_download.update(1)
+            yield item
+        else:
+            item['Site'] = 'ERROR'
+            self.pbar_download.update(1)
+            yield item
