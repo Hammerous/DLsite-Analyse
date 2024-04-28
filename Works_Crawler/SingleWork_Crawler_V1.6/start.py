@@ -6,7 +6,7 @@ dirpath=os.path.dirname(os.path.abspath(__file__))
 os.chdir(dirpath)         # 切换到当前目录
 if os.path.exists('all.log'):
     os.remove('all.log')
-cmdline.execute("scrapy crawl WorksCrawler -a csv_path=D:\\2024Spring\\DLsite-Analysis\\Works_Crawler\\SingleWork_Crawler_V1.6\\日間ランキング.csv -s LOG_FILE=all.log".split())
+cmdline.execute("scrapy crawl WorksCrawler -a csv_path=D:\\2024Spring\\DLsite-Analysis\\main_batch\Missing.csv -s LOG_FILE=all.log".split())
 #'''
 '''
 from scrapy.crawler import CrawlerProcess

@@ -46,7 +46,7 @@ class SingleworkCrawlerPipeline:
         # 重新输出'\n'，并输入']'，与 open_spider(self, spider) 时输出的 '['，构成一个完整的数组格式
         self.json_file.write('\n]')
 
-        print('Checking data completency...')
+        print('Checking data integrity...')
         # 读取JSON文件中的所有ID
         self.json_file.seek(0)  # 移动到文件开头
         try:

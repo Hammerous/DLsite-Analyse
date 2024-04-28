@@ -3,7 +3,9 @@ from scrapy.crawler import CrawlerRunner
 from scrapy.utils.project import get_project_settings
 from twisted.internet import reactor
 
-folder_path = r'D:\2024Spring\DLsite-Analysis\ID_Crawler\WorkID_inPage_V1.1\CSVs\batches'
+#folder_path = r'D:\2024Spring\DLsite-Analysis\batches'
+#folder_path = r'D:\2024Spring\DLsite-Analysis\batches1'
+folder_path = r'D:\2024Spring\DLsite-Analysis\batches2'
 
 '''
 i = 0
@@ -22,7 +24,7 @@ i = 0
 def crawl(runner):
     global i,file_path
     if(i<len(file_path)):
-        print('\nCrawl Mission {0}/{1}: {2}'.format(i+1,len(file_path),file_path))
+        print('\nCrawl Mission {0}/{1}: {2}'.format(i+1,len(file_path),file_path[i]))
         d = runner.crawl('WorksCrawler',file_path[i])
         #d.addBoth(sleep)
         d.addBoth(lambda _: crawl(runner))
