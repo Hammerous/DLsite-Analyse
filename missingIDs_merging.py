@@ -75,6 +75,6 @@ def missingIDS_check(directory_path, json_file_path):
         print("All IDs Checked!")
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-#merge_txt_to_csv(r'ALL Batches', r'batches\Missing.csv')
-missingIDS_check('batches', 'dojinDB.json')
-#merge_json2json(r'batches', r'batches\Missing.json')
+#merge_txt_to_csv(r'main_batch', r'main_batch\Missing.csv')
+#missingIDS_check('batches', 'dojinDB.json')
+merge_json2json(r'batches2', r'batches2\Missing.json')
