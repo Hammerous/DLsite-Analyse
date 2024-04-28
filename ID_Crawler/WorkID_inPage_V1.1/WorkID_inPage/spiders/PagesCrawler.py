@@ -30,6 +30,8 @@ class PagescrawlerSpider(scrapy.Spider):
         to filter the 'Tag' domain with unique tags
         """
         try:
+            dirpath= os.path.abspath(os.curdir)
+            csv_file_path = os.path.join(dirpath,csv_file_path)
             df = pd.read_csv(csv_file_path)
             tags = df['Tag'].tolist()
             unique_tags = list(set(tags))  
@@ -46,7 +48,7 @@ class PagescrawlerSpider(scrapy.Spider):
         item['ID'] = []
         item['Page_avail'] = True
         sub_pbar = tqdm(total=int(item['Item_Num']), desc="Scanning {0}".format(self.target_tags[pbar_id]), leave=True,\
-                                position = pbar_id ,mininterval = 0.5)
+                                position = pbar_id ,mininterval = 1)
         self.pbar_lst.append(sub_pbar)
         return self.page_turning(item, response.url, pbar_id)
 
@@ -56,7 +58,6 @@ class PagescrawlerSpider(scrapy.Spider):
         self.start_urls.pop(0)
         for idx in range(len(self.start_urls)):
             yield scrapy.Request(url=self.start_urls[idx], callback = lambda response, pbar_id = idx : self.get_initail_param(response,pbar_id), dont_filter = True)
-        
         '''        
         yield scrapy.Request(main_url, callback=self.get_initail_param)
         ### request directly will create a cookie, initially disactivate the AI filter

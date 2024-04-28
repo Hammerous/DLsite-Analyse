@@ -30,7 +30,7 @@ def loop_crawl():
 if __name__ == '__main__':
     i = 0
     Crawler_Mission = [['HomepageCrawler'],['TagsCrawler', tag_csvpath],\
-                       ['PagesCrawler', 'test_tag.csv']]
+                       ['PagesCrawler', tag_csvpath]]
     dirpath=os.path.dirname(os.path.abspath(__file__))
     # 获取当前路径
     os.chdir(dirpath)         # 切换到当前目录
