@@ -76,13 +76,7 @@ class MainsiteCrawlerPipeline:
             # checking site details
             release_dtl = copy.deepcopy(value)
             for each in json_data:
-                if each['Site'][0] == 'D':
-                    for sub_key, sub_value in value.items():
-                        if sub_key[0] == 'd':
-                            release_dtl.pop(sub_key)
-                            break
-                else:
-                    release_dtl.pop(each['Site'])
+                release_dtl.pop(each['Site'])
             if(release_dtl):
                 missing_ids.append({"ID" : key, "release_dtl" : release_dtl})
         ### when scanning, all RJ and DM ids information under the same dojin ID will be saved to the Missing file if any defection found

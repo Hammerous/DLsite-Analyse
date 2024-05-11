@@ -75,7 +75,7 @@ class DualsitesSpiderSpider(scrapy.Spider):
                 elif site_id[0] == 'd':     #DMM serial
                     self.pbar_request.update(1)
                     url = f'https://www.dmm.co.jp/dc/doujin/-/detail/=/cid={site_id}/'
-                    yield scrapy.Request(url, callback=self.parse_FANZA, cookies = self.FANZA_cookies, meta={"ID": ID})
+                    yield scrapy.Request(url, callback=self.parse_FANZA, cookies = self.FANZA_cookies, meta={"ID": ID, "DM": site_id})
 
     def Dlsite_Extract(self, term, info_item):
         if(term in self.Dlsite_terms):
@@ -200,7 +200,7 @@ class DualsitesSpiderSpider(scrapy.Spider):
         item['Circle'] = response.xpath("//a[@class='circleName__txt']/text()").get().strip()
         basic_info = response.xpath("//div[@class='l-areaProductInfo']")
         if(len(basic_info)):
-            item['Site'] = 'DM'
+            item['Site'] = response.meta['DM']
             level0_info = basic_info.xpath(".//div[@class='productSales']")
             item['Sales'] = level0_info.xpath(".//span[@class='numberOfSales__txt']/text()").get()
             string_info = level0_info.xpath(".//span[@class='favorites__txt']/text()").get()

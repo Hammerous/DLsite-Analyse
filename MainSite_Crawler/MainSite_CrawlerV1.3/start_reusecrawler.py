@@ -3,8 +3,8 @@ from scrapy.crawler import CrawlerRunner
 from scrapy.utils.project import get_project_settings
 import os,time
 
-folder_path = r'D:\2024Spring\DLsite-Analysis\test_batch'
-#folder_path = r'D:\2024Spring\DLsite-Analysis\batches'
+#folder_path = r'D:\2024Spring\DLsite-Analysis\test_batch'
+folder_path = r'D:\2024Spring\DLsite-Analysis\batches'
 #folder_path = r'D:\2024Spring\DLsite-Analysis\Missing_batches'
 #folder_path = r'D:\2024Spring\DLsite-Analysis\batches1'
 #folder_path = r'D:\2024Spring\DLsite-Analysis\batches2'
