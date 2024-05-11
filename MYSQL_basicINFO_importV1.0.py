@@ -234,10 +234,10 @@ def record_extract(info, dict, doujin_id):
         if date not in dict:
             price = float(info['price'])
             amount = round(float(info['amount']))
-            code_id = info['amount']
+            code_id = info['code']
             dict[date] = (jd2date(date),doujin_id,code_id,price,amount)
 
-def insert_sales_history(historyData,doujin_id):
+def insert_sales_history(historyData,doujin_id, daily_lst, monthly_lst):
     daily_dict = {}
     monthly_dict = {}
     for type, data in historyData.items():
@@ -246,6 +246,9 @@ def insert_sales_history(historyData,doujin_id):
                 record_extract(data['log'], daily_dict, doujin_id)
             else:
                 record_extract(data['log'], monthly_dict, doujin_id)
+    daily_lst.extend([value + (key,) for key, value in daily_dict.items()])
+    monthly_lst.extend([value + (key,) for key, value in monthly_dict.items()])
+    '''
     cursor.executemany("""
                        INSERT INTO SalesRecord_daily (time_str, doujin_id, code_id, price, amount, jd_time) 
                        VALUES (%s, %s, %s, %s, %s, %s);
@@ -254,14 +257,16 @@ def insert_sales_history(historyData,doujin_id):
                        INSERT INTO SalesRecord_monthly (time_str, doujin_id, code_id, price, amount, jd_time) 
                        VALUES (%s, %s, %s, %s, %s, %s);
                        """,[value + (key,) for key, value in monthly_dict.items()])
+    '''
     
-def insert_price_history(priceData,doujin_id):
+def insert_price_history(priceData,doujin_id, price_lst):
     priceinfo_lst = []
     for idx in range(len(priceData['time'])):
         priceinfo_lst.append((date2jd(priceData['time'][idx]),priceData['time'][idx],doujin_id, \
                             None if priceData['dlsite'][idx] == 'None' else priceData['dlsite'][idx], \
                             None if priceData['fanza'][idx] == 'None' else priceData['fanza'][idx]))
-    cursor.executemany("INSERT INTO doujinPrice (jd_time, time_str, doujin_id, price_DLsite, price_FANZA) VALUES (%s, %s, %s, %s, %s);",priceinfo_lst)
+    price_lst.extend(priceinfo_lst)
+    #cursor.executemany("INSERT INTO doujinPrice (jd_time, time_str, doujin_id, price_DLsite, price_FANZA) VALUES (%s, %s, %s, %s, %s);",priceinfo_lst)
 
 #file_path = r"D:\2024Spring\DLsite-Analysis\data_20240428.json"
 file_path = r"D:\2024Spring\DLsite-Analysis\test.json"
@@ -275,7 +280,7 @@ if __name__=='__main__':
     #db = pymysql.connect(host='106.15.203.185',user='oldyear',password='gui99lover', charset='utf8')
     cursor = db.cursor()
     db_name = 'testDB'
-    #db_name = 'Real_test'
+    #db_name = 'Real_test_1'
 
     # 执行删除数据库的 SQL 命令
     cursor.execute(f"DROP DATABASE IF EXISTS {db_name}")
@@ -312,6 +317,11 @@ if __name__=='__main__':
                 'Music':({},[]),
                 'Senario':({},[])}
     DM_tmpdict = {'WorkType':({},[])}
+
+    list_bufferSize = 100000
+    daily_lst = []
+    monthly_lst = []
+    price_lst = []
 
     with open(file_path, 'r', encoding='UTF-8') as f:
         for record in ijson.items(f, 'item'):
@@ -420,8 +430,25 @@ if __name__=='__main__':
                 """, (record['ID'], Work_main_id, record['extra_info']['Rank'] if len(record['extra_info']) else None))
                 #cursor.execute("INSERT INTO Work_main2doujinWork (Work_main_id, doujinWork_id) VALUES (%s, %s);", (Work_main_id, record['ID']))
                 doujin2WorkID_dict[record['ID']] = Work_main_id
-                insert_price_history(record['price_data'], record['ID'])
-                insert_sales_history(record['historyData'], record['ID'])
+                insert_price_history(record['price_data'], record['ID'], price_lst)
+                insert_sales_history(record['historyData'], record['ID'],daily_lst, monthly_lst)
+
+                if(len(daily_lst) == list_bufferSize):
+                    cursor.executemany("""
+                       INSERT DELAYED INTO SalesRecord_daily (time_str, doujin_id, code_id, price, amount, jd_time) 
+                       VALUES (%s, %s, %s, %s, %s, %s);
+                       """,daily_lst)
+                    daily_lst = []
+                if(len(monthly_lst) == list_bufferSize):
+                    cursor.executemany("""
+                       INSERT DELAYED INTO SalesRecord_monthly (time_str, doujin_id, code_id, price, amount, jd_time) 
+                       VALUES (%s, %s, %s, %s, %s, %s);
+                       """,monthly_lst)
+                    monthly_lst = []
+                if(len(price_lst) == list_bufferSize):
+                    cursor.executemany("INSERT DELAYED INTO doujinPrice (jd_time, time_str, doujin_id, price_DLsite, price_FANZA) VALUES (%s, %s, %s, %s, %s);", price_lst)
+                    price_lst = []
+                
                 if(Child_RJexist):
                     cursor.execute("UPDATE RJWork SET doujin_id = %s, ref_price = %s WHERE id = %s",(record['ID'], Child_RJ_price, each['Site'][2:]))
             else:
@@ -446,6 +473,20 @@ if __name__=='__main__':
                 Series2CircleID_lst.extend([(CircleID,WorkMain_tmpdict['Series'][0][each]) for each in WorkMain_setDict['Series']])
             pbar_record.update(1)
     pbar_record.close()
+
+    if(len(daily_lst)):
+        cursor.executemany("""
+            INSERT DELAYED INTO SalesRecord_daily (time_str, doujin_id, code_id, price, amount, jd_time) 
+            VALUES (%s, %s, %s, %s, %s, %s);
+            """,daily_lst)
+    if(len(monthly_lst)):
+        cursor.executemany("""
+            INSERT DELAYED INTO SalesRecord_monthly (time_str, doujin_id, code_id, price, amount, jd_time) 
+            VALUES (%s, %s, %s, %s, %s, %s);
+            """,monthly_lst)
+    if(len(price_lst)):
+        cursor.executemany("INSERT DELAYED INTO doujinPrice (jd_time, time_str, doujin_id, price_DLsite, price_FANZA) VALUES (%s, %s, %s, %s, %s);", price_lst)
+    
     print("Data in Memory writing into DATABASE...")
     print("Writing Work_main...")
     cursor.executemany("INSERT DELAYED INTO Work_main (id, title) VALUES (%s, %s);", [(key, value) for key, value in Work_main_dict.items()])
@@ -467,7 +508,6 @@ if __name__=='__main__':
     cursor.close()
     db.close()
     print("ALL Records in DATABASE!")
-
 
 '''
 def insert_lstID(parent, entity, insert_item, ID):
