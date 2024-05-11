@@ -4,8 +4,8 @@ from scrapy.utils.project import get_project_settings
 from twisted.internet import reactor
 
 #folder_path = r'D:\2024Spring\DLsite-Analysis\batches'
-#folder_path = r'D:\2024Spring\DLsite-Analysis\batches1'
-folder_path = r'D:\2024Spring\DLsite-Analysis\batches2'
+folder_path = r'D:\2024Spring\DLsite-Analysis\batches1'
+#folder_path = r'D:\2024Spring\DLsite-Analysis\batches2'
 
 '''
 i = 0

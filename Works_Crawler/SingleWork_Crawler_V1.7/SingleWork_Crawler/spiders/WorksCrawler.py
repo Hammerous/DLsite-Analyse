@@ -111,7 +111,9 @@ class WorkcrawlerSpider(scrapy.Spider):
         #obtain main genre and title
         title_span = response.xpath('//span[@class="work_title"]')
         item["main_genre"] = title_span.xpath('.//span[@class="label label-lg label-genre"]/text()').get()
-        item["title"] = title_span.xpath('.//text()').getall()[-1].strip()
+        title = title_span.xpath('.//text()').getall()[-1]
+        if(title):
+            item["title"] = title.strip()
         release_info = response.xpath('//table[@class="table table-rsp mb15"]/tr')
 
         item["release_dtl"] = {}
@@ -133,7 +135,9 @@ class WorkcrawlerSpider(scrapy.Spider):
         #obtain circle
         select_xpath = response.xpath('//div[@class="col-sm-5 mb20 work_detail"]')
         #link = select_xpath.xpath(".//a[@itemprop="item"]/@href").get()
-        item["circle"] = select_xpath.xpath('.//table[@class="table mb0"]/tr/td[2]/a/text()').get().strip()
+        circle = select_xpath.xpath('.//table[@class="table mb0"]/tr/td[2]/a/text()').get()
+        if(circle):
+            item["circle"] = circle.strip()
         #obtain price data
         """
         #below extracts data of sellings in current figure(these data are incorperated in historic data)
