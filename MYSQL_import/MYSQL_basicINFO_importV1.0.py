@@ -277,7 +277,6 @@ if __name__=='__main__':
     #items_numbers = 325000
     # 连接到MySQL服务器
     db = pymysql.connect(host='localhost',user='root',password='Pathfinder', charset='utf8')
-    #db = pymysql.connect(host='106.15.203.185',user='oldyear',password='gui99lover', charset='utf8')
     cursor = db.cursor()
     db_name = 'testDB'
     #db_name = 'Real_test_1'
