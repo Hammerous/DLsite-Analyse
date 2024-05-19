@@ -15,12 +15,6 @@ class DualsitesSpiderSpider(scrapy.Spider):
     crawl_folder_path = None
     url_sum = 0
 
-    def DLsite_requests(self, RJ):
-        workpage_url = "https://www.dlsite.com/maniax/work/=/product_id/{0}.html/?locale=ja_JP".format(RJ)
-        reviews_url = "https://www.dlsite.com/maniax/api/review?product_id={0}&limit=1&mix_pickup=true".format(RJ)
-        work_details_url = "https://www.dlsite.com/maniax/product/info/ajax?product_id={0}".format(RJ)
-        return workpage_url, [reviews_url, work_details_url]
-
     terms_filter_simple = {'Series','Illust','Creator','Senario','CV','Music','Released_date'}
     terms_filter_sets = {'Age_Restrict','Genre','Other_info'}
 
@@ -77,8 +71,8 @@ class DualsitesSpiderSpider(scrapy.Spider):
                         url = f'https://www.dmm.co.jp/dc/doujin/-/detail/=/cid={site_id}/'
                         yield scrapy.Request(url, callback=self.parse_FANZA, cookies = self.FANZA_cookies, meta={"Status": status, "ID": ID, "DM": site_id})
                     else:                       #RJ serial
-                        url, urls = self.DLsite_requests(site_id)
-                        yield scrapy.Request(url, callback=self.parse_DLsite_workpage, meta={"Status": status, "ID": ID, "RJ": site_id, "urls": urls})
+                        workpage_url = "https://www.dlsite.com/maniax/work/=/product_id/{0}.html/?locale=ja_JP".format(site_id)
+                        yield scrapy.Request(workpage_url, callback=self.parse_DLsite_workpage, meta={"Status": status, "ID": ID, "RJ": site_id})
                     self.pbar_request.update(1)
 
     def Dlsite_Extract(self, term, info_item):
@@ -126,9 +120,11 @@ class DualsitesSpiderSpider(scrapy.Spider):
                 if(item_type == None):
                     continue
                 item[item_type] = info_content
-            next_url = response.meta['urls'][0]
-            request = scrapy.Request(next_url, callback=self.parse_DLsite_reviews, meta=response.meta)
+            target_sitetype = response.request.url.split("/")[3]
+            reviews_url = "https://www.dlsite.com/{0}/api/review?product_id={1}&limit=1&mix_pickup=true".format(target_sitetype,response.meta["RJ"])
+            request = scrapy.Request(reviews_url, callback=self.parse_DLsite_reviews, meta=response.meta)
             request.meta["item"] = item
+            request.meta["detail_url"] = "https://www.dlsite.com/{0}/product/info/ajax?product_id={1}".format(target_sitetype,response.meta["RJ"])
             yield request
         else:
             item['Site'] = 'ERROR'
@@ -143,7 +139,7 @@ class DualsitesSpiderSpider(scrapy.Spider):
             item = response.meta["item"]
             item['Reviews_info'] = Reviews_info
             item['Title'] = data['product_name'].strip()
-        next_url = response.meta['urls'][1]
+        next_url = response.meta['detail_url']
         request = scrapy.Request(next_url, callback=self.parse_DLsite_workdetails, meta=response.meta)
         request.meta["item"] = item
         yield request

@@ -43,12 +43,6 @@ class SubrjCrawlerSpider(scrapy.Spider):
             self.RJ2IDs = json.load(f)
         print('{0} RJ records found'.format(len(self.RJ2IDs.items())))
 
-    def DLsite_requests(self, RJ):
-        workpage_url = "https://www.dlsite.com/maniax/work/=/product_id/{0}.html/?locale=ja_JP".format(RJ)
-        reviews_url = "https://www.dlsite.com/maniax/api/review?product_id={0}&limit=1&mix_pickup=true&locale=ja_JP".format(RJ)
-        work_details_url = "https://www.dlsite.com/maniax/product/info/ajax?product_id={0}&locale=ja_JP".format(RJ)
-        return workpage_url, [reviews_url, work_details_url]
-
     def file_extract(self, json_path):
         print('Loading {0} ...'.format(json_path))
         with open(json_path,"r+", encoding='utf-8') as f:
@@ -68,8 +62,8 @@ class SubrjCrawlerSpider(scrapy.Spider):
             self.pbar_download = tqdm(total=len(self.RJ2IDs), desc="Download Progress", leave=True, position = 1, mininterval = 1)
             for RJ, ID in self.RJ2IDs.items():
                 self.pbar_request.update(1)
-                url, urls = self.DLsite_requests(RJ)
-                yield scrapy.Request(url, callback=self.parse_DLsite_workpage, meta={"ID": ID, "RJ": RJ, "urls": urls})
+                workpage_url = "https://www.dlsite.com/maniax/work/=/product_id/{0}.html/?locale=ja_JP".format(RJ)
+                yield scrapy.Request(workpage_url, callback=self.parse_DLsite_workpage, meta={"ID": ID, "RJ": RJ})
         else:
             return
 
@@ -97,7 +91,6 @@ class SubrjCrawlerSpider(scrapy.Spider):
         item = DLsiteCrawlerItem()
         item['ID'] = response.meta['ID']
         item['Status'] = 'verified'
-        item['Title'] = response.xpath("//div[@class='base_title_br clearfix']/h1/text()").get().strip()
         item['Circle'] = response.xpath("//table[@id='work_maker']/tr/td/span/a/text()").get().strip()
         language_info = response.xpath("//div[@class='work_edition_linklist type_trans']/a")
         if(len(language_info)):
@@ -105,11 +98,11 @@ class SubrjCrawlerSpider(scrapy.Spider):
                 RJ_serial = each.xpath(".//@href").get().split("/")[-1].split(".")[0]
                 if(RJ_serial == response.meta['RJ']):
                     item['language'] = each.xpath(".//text()").get().strip()
-                    break                   ### record not in the default dict
+                    break    ### record not in the default dict
         else:
             item['language'] = '日本語(DEFAULT)'
-
         basic_info = response.xpath("//table[@id='work_outline']/tr")
+        
         if(len(basic_info)):
             item['Site'] = response.meta['RJ']
             for info_item in basic_info:
@@ -118,9 +111,11 @@ class SubrjCrawlerSpider(scrapy.Spider):
                 if(item_type == None):
                     continue
                 item[item_type] = info_content
-            next_url = response.meta['urls'][0]
-            request = scrapy.Request(next_url, callback=self.parse_DLsite_reviews, meta=response.meta)
+            target_sitetype = response.request.url.split("/")[3]
+            reviews_url = "https://www.dlsite.com/{0}/api/review?product_id={1}&limit=1&mix_pickup=true".format(target_sitetype,response.meta["RJ"])
+            request = scrapy.Request(reviews_url, callback=self.parse_DLsite_reviews, meta=response.meta)
             request.meta["item"] = item
+            request.meta["detail_url"] = "https://www.dlsite.com/{0}/product/info/ajax?product_id={1}".format(target_sitetype,response.meta["RJ"])
             yield request
         else:
             item['Site'] = 'ERROR'
@@ -134,8 +129,8 @@ class SubrjCrawlerSpider(scrapy.Spider):
                 Reviews_info[record['name']] = record['genre_count']
             item = response.meta["item"]
             item['Reviews_info'] = Reviews_info
-            item['Title'] = data['product_name']
-        next_url = response.meta['urls'][1]
+            item['Title'] = data['product_name'].strip()
+        next_url = response.meta['detail_url']
         request = scrapy.Request(next_url, callback=self.parse_DLsite_workdetails, meta=response.meta)
         request.meta["item"] = item
         yield request

@@ -1,7 +1,7 @@
-2024-05-15 21:34:25 [scrapy.core.engine] ERROR: Scraper close failure
+2024-05-19 01:53:44 [scrapy.core.engine] ERROR: Scraper close failure
 Traceback (most recent call last):
   File "E:\Softwares\Anaconda\lib\site-packages\twisted\internet\defer.py", line 857, in _runCallbacks
     current.result = callback(  # type: ignore[misc]
-  File "D:\2024Spring\DLsite-Analysis\MainSite_Crawler\MainSite_CrawlerV2.0\MainSite_Crawler\pipelines.py", line 48, in close_spider
-    all_ids.append({"ID" : key, "verified": value['verified'], "controversial": value['controversial']})
-TypeError: 'set' object is not subscriptable
+  File "D:\2024Spring\DLsite-Analysis\MainSite_Crawler\MainSite_CrawlerV2.0\MainSite_Crawler\pipelines.py", line 79, in close_spider
+    copy_dict[each['Status']].remove(each['Site'])
+ValueError: list.remove(x): x not in list

@@ -3,11 +3,11 @@ from scrapy.crawler import CrawlerRunner
 from scrapy.utils.project import get_project_settings
 import os,time
 
-folder_path = r'D:\2024Spring\DLsite-Analysis\test_batch'
+#folder_path = r'D:\2024Spring\DLsite-Analysis\test_batch'
 #folder_path = r'D:\2024Spring\DLsite-Analysis\batches'
-#folder_path = r'D:\2024Spring\DLsite-Analysis\Missing_batches'
 #folder_path = r'D:\2024Spring\DLsite-Analysis\batches1'
 #folder_path = r'D:\2024Spring\DLsite-Analysis\batches2'
+#folder_path = r'D:\2024Spring\DLsite-Analysis\Missing_batches'
 
 def sleep(_, duration=1):
     print(f'sleeping for: {duration}')
