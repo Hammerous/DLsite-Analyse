@@ -1,4 +1,5 @@
 2024/06/04
+
 Next to do:
 
 1.Remove "doujin_id" in table salesrecords and table doujinprice, 
@@ -12,3 +13,6 @@ Next to do:
 
 ![125449055a8ab3ce5a6b34d3b1cae40](https://github.com/Hammerous/DLsite-Analyse/assets/79643219/d01b4e64-ba57-4aff-bfbd-d8f47b42891a)
 ![0ae048f0fc995bf6d27c11b889b71fc](https://github.com/Hammerous/DLsite-Analyse/assets/79643219/a60e9b2b-df43-496c-bae5-3dbf6c022095)
+
+4.Some data still faces problems of being omitted during insertion due to incorrect Child_dict (e.g batch_60),
+  deal with the inconsistency in data first
