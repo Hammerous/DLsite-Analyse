@@ -1,8 +1,10 @@
 2024/06/04
 Next to do:
+
 1.Remove "doujin_id" in table salesrecords and table doujinprice, 
   this is no longer needed for such massive data tables; 
   successive steps will search the temporal record according to code_id
+  
 2.Merge table doujin2circle into table doujinwork, with one single circle align with each doujin Work
 ![5d1fce29e4f8d44ba8dcfa3fcd73af2](https://github.com/Hammerous/DLsite-Analyse/assets/79643219/4186416c-eb11-49ed-bdd5-5a49bf48c097)
 
